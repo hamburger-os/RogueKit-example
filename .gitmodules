@@ -1,0 +1,3 @@
+[submodule "lib/roguekit"]
+	path = lib/roguekit
+	url = https://github.com/hamburger-os/RogueKit.git
