@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="EntityData" load_steps=2 format=3 uid="uid://c6x0y1sguwacj"]
+
+[ext_resource type="Script" path="res://lib/roguekit/entity/entity_data.gd" id="1_entity_data"]
+
+[resource]
+script = ExtResource("1_entity_data")
+entity_name = "Player"
+max_health = 100
+stats = {"attack": 10, "speed": 100}

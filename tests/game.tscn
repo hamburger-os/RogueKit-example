@@ -1,0 +1,28 @@
+[gd_scene load_steps=7 format=3 uid="uid://dnmc1t2w3xqyv"]
+
+[ext_resource type="Script" path="res://tests/game.gd" id="1_game_script"]
+[ext_resource type="Script" path="res://lib/roguekit/turn_based/turn_manager.gd" id="2_turn_manager_script"]
+[ext_resource type="PackedScene" uid="uid://b1vjprgqjkafp" path="res://tests/player.tscn" id="3_player_scene"]
+[ext_resource type="PackedScene" uid="uid://cwha7wim1bqk8" path="res://tests/enemy.tscn" id="4_enemy_scene"]
+[ext_resource type="Script" path="res://lib/roguekit/core/events.gd" id="5_events_script"]
+[ext_resource type="Script" path="res://lib/roguekit/game_flow/game_manager.gd" id="6_game_manager_script"]
+
+[node name="Game" type="Node"]
+script = ExtResource("1_game_script")
+
+[node name="Events" type="Node" parent="."]
+script = ExtResource("5_events_script")
+
+[node name="GameManager" type="Node" parent="."]
+script = ExtResource("6_game_manager_script")
+
+[node name="TurnManager" type="Node" parent="."]
+script = ExtResource("2_turn_manager_script")
+
+[node name="Player" parent="." instance=ExtResource("3_player_scene")]
+position = Vector2(100, 100)
+
+[node name="Enemies" type="Node" parent="."]
+
+[node name="Enemy1" parent="Enemies" instance=ExtResource("4_enemy_scene")]
+position = Vector2(300, 100)
