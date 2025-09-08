@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script="res://lib/roguekit/game_flow/wave_event.gd"]
+
+[resource]
+timestamp = 60.0
+action = 2 # WaveEvent.Action.MODIFY_SPAWN
+enemy_key = "grunt"
+spawn_rate = 3.0

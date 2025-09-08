@@ -1,0 +1,5 @@
+[gd_resource type="Resource" script="res://lib/roguekit/game_flow/wave_event.gd"]
+
+[resource]
+timestamp = 180.0
+action = 4 # WaveEvent.Action.SET_BOSS_FLAG

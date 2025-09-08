@@ -1,0 +1,11 @@
+[gd_resource type="Resource" load_steps=6 format=3 uid="uid://cx603l6f04d7"]
+
+[ext_resource type="Script" path="res://lib/roguekit/game_flow/wave_profile.gd" id="1_profile"]
+[ext_resource type="Resource" path="res://content/levels/wave_profiles/events/event_start_grunt_spawn.tres" id="2_start_grunt"]
+[ext_resource type="Resource" path="res://content/levels/wave_profiles/events/event_start_ranger_spawn.tres" id="3_start_ranger"]
+[ext_resource type="Resource" path="res://content/levels/wave_profiles/events/event_modify_grunt_spawn.tres" id="4_modify_grunt"]
+[ext_resource type="Resource" path="res://content/levels/wave_profiles/events/event_set_boss_flag.tres" id="5_boss_flag"]
+
+[resource]
+script = ExtResource("1_profile")
+timeline_events = Array[ExtResource]([ExtResource("2_start_grunt"), ExtResource("3_start_ranger"), ExtResource("4_modify_grunt"), ExtResource("5_boss_flag")])

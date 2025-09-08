@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script="res://lib/roguekit/game_flow/wave_event.gd"]
+
+[resource]
+timestamp = 120.0
+action = 3 # WaveEvent.Action.SPAWN_GROUP
+# elite_group_id 暂时用 spawn_group 来表示，实际游戏中应是 EntityData 数组
+spawn_group = [
+    # 这里应该放入实际的 EntityData 资源，例如：
+    # preload("res://content/enemies/elite_enemy_a.tres"),
+    # preload("res://content/enemies/elite_enemy_b.tres")
+]

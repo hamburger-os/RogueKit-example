@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script="res://lib/roguekit/game_flow/wave_event.gd"]
+
+[resource]
+timestamp = 30.0
+action = 0 # WaveEvent.Action.START_SPAWNING
+enemy_key = "ranger"
+spawn_rate = 0.5
+max_alive = 5

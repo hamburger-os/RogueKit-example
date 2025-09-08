@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script="res://lib/roguekit/item/base_item_data.gd"] # Placeholder for UpgradeData
+
+[ext_resource path="res://lib/roguekit/entity/stat_modifier.gd" type="Script" id="1_modifier"]
+
+[resource]
+stat_modifier = SubResource("1_modifier")
+
+[sub_resource type="Resource" id="1_modifier"]
+script = ExtResource("1_modifier")
+value = 2.0
+type = 0 # StatModifier.ModifierType.ADDITIVE
+stat_name = "projectile_count"
