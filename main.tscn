@@ -1,0 +1,38 @@
+[gd_scene load_steps=7 format=3 uid="uid://c1v1w1x1v1w1"]
+
+[ext_resource type="Script" uid="uid://c5hht4s3f4v83" path="res://lib/roguekit/game_flow/game_manager.gd" id="1_gm"]
+[ext_resource type="Script" uid="uid://bsnxhw6a1lsjk" path="res://lib/roguekit/game_flow/wave_manager.gd" id="2_wm"]
+[ext_resource type="Script" uid="uid://sur22hapmhcs" path="res://lib/roguekit/turn_based/turn_manager.gd" id="3_tm"]
+[ext_resource type="Script" uid="uid://buuvxabqg6v8w" path="res://lib/roguekit/world_gen/map_generator.gd" id="4_mg"]
+[ext_resource type="Script" uid="uid://biui4awe88evr" path="res://lib/roguekit/world_gen/map_builder.gd" id="5_mb"]
+[ext_resource type="Resource" uid="uid://cx603l6f04d7" path="res://content/levels/wave_profiles/wave_profile_data.tres" id="6_wpd"]
+
+[node name="Main" type="Node2D"]
+
+[node name="GameManager" type="Node" parent="."]
+script = ExtResource("1_gm")
+turn_manager = NodePath("TurnManager")
+map_generator = NodePath("MapGenerator")
+map_builder = NodePath("MapBuilder")
+entity_container = NodePath("Entities")
+tilemap_node = NodePath("TileMap")
+wave_manager = NodePath("WaveManager")
+map_profile = ExtResource("6_wpd")
+
+[node name="WaveManager" type="Node" parent="GameManager"]
+script = ExtResource("2_wm")
+wave_profile = ExtResource("6_wpd")
+
+[node name="TurnManager" type="Node" parent="GameManager"]
+script = ExtResource("3_tm")
+
+[node name="MapGenerator" type="Node" parent="GameManager"]
+script = ExtResource("4_mg")
+
+[node name="MapBuilder" type="Node" parent="GameManager"]
+script = ExtResource("5_mb")
+
+[node name="Entities" type="Node2D" parent="."]
+
+[node name="TileMap" type="TileMap" parent="."]
+format = 2

@@ -17,8 +17,8 @@ func execute(context: EffectContext):
 	# 遍历所有实体来查找附近的敌人
 	# 这里需要一个全局的实体管理系统，或者通过 GameManager 来获取所有实体
 	# 假设 GameManager 有一个方法来获取所有实体
-	if game_manager and game_manager.has_method("get_all_entities"):
-		for entity in game_manager.get_all_entities():
+	if context.game_manager and context.game_manager.has_method("get_all_entities"):
+		for entity in context.game_manager.get_all_entities():
 			if entity != context.target and entity.has_method("get_health_component") and entity.get_health_component() and entity.global_position.distance_to(original_target_pos) <= radius:
 				# 简单的敌人检测，可以根据需要添加更多条件（如标签、阵营等）
 				nearby_enemies.append(entity)

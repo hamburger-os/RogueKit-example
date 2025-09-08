@@ -1,0 +1,20 @@
+[gd_resource type="Resource" load_steps=3 format=3 uid="uid://new_unique_uid_focus"]
+
+[ext_resource type="Script" path="res://lib/roguekit/item/base_item_data.gd" id="1_base_item"]
+[ext_resource type="Script" path="res://lib/roguekit/entity/stat_modifier.gd" id="2_mod"]
+
+[sub_resource type="Resource" id="1_damage_modifier"]
+script = ExtResource("2_mod")
+value = 0.2
+type = 1 # StatModifier.ModifierType.MULTIPLICATIVE
+stat_name = "damage_multiplier"
+
+[sub_resource type="Resource" id="2_area_modifier"]
+script = ExtResource("2_mod")
+value = 0.2
+type = 1 # StatModifier.ModifierType.MULTIPLICATIVE
+stat_name = "area_size_multiplier"
+
+[resource]
+script = ExtResource("1_base_item")
+stat_modifiers = [SubResource("1_damage_modifier"), SubResource("2_area_modifier")]

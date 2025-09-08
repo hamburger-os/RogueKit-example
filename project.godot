@@ -1,0 +1,22 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="RogueKit-example"
+run/main_scene="res://main.tscn"
+config/features=PackedStringArray("4.4")
+"#Assumingamainsceneexistsorwillbecreated[autoload]GameManager"="res://lib/roguekit/game_flow/game_manager.gd"
+Events="res://lib/roguekit/core/events.gd"
+ObjectPool="res://lib/roguekit/core/object_pool.gd"
+
+[rendering]
+
+renderer/rendering_method="mobile"

@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script="res://lib/roguekit/game_flow/wave_event.gd" format=3 uid="uid://d33d3d3d3d3d_start_grunt"]
+
+[resource]
+timestamp = 0.0
+action = 0 # WaveEvent.Action.START_SPAWNING
+enemy_key = "grunt"
+spawn_rate = 2.0
+max_alive = 20
