@@ -69,33 +69,28 @@
 
 首先，我们需要定义两种类型的能力资源：
 
-  * **`AbilityCoreData` (Resource)**：定义法术的基础行为。例如 `core_fireball.tres`。
+  * **`ProjectileAbilityCoreData` (Resource)**：一种具体的能力核心，定义了投射物法术的基础行为。查看 [`extensions/custom_abilities/projectile_ability_core_data.gd`](extensions/custom_abilities/projectile_ability_core_data.gd)。
 
-      * `core_type`: `PROJECTILE` (投射物类型)
-      * `base_damage`: 10
-      * `base_speed`: 300
-      * `vfx_scene`: `res://prefabs/vfx/fireball.tscn`
-      * `hit_effects`: [ `DamageEffect.tres` ]
-
-  * **`AbilityModifierData` (Resource)**：定义一个可附加的额外逻辑。例如 `modifier_chain_reaction.tres`。
-
-      * `modifier_name`: "连锁反应"
-      * `description`: "击中敌人时弹射到附近的额外2个目标。"
-      * `tags_required`: [ `projectile` ] (确保只能附加到投射物核心上)
-      * `effects_to_add`: [ `ChainReactionEffect.tres` ]
+  * **`AbilityModifierData` (Resource)**：定义一个可附加的额外逻辑。查看 [`lib/roguekit/entity/ability_modifier_data.gd`](lib/roguekit/entity/ability_modifier_data.gd)。
+      * 示例: [`content/abilities/modifiers/chain_reaction.tres`](content/abilities/modifiers/chain_reaction.tres)
+      * 关键属性:
+          * `modifier_name`: "连锁反应"
+          * `description`: "击中敌人时弹射到附近的额外2个目标。"
+          * `tags_required`: [ `projectile` ] (确保只能附加到投射物核心上)
+          * `effects_to_add`: [ `res://extensions/custom_effects/effect_chain_reaction.tres` ]
 
 #### 步骤 2：实现修饰符的独特逻辑 (`EffectData` 扩展)
 
 “连锁反应”需要自定义逻辑，因此我们创建新脚本：
 
-  * **创建脚本 `effect_chain_reaction.gd`**，继承自 `EffectData`。
-  * **重写 `execute(context)` 方法**：
-      * `context` 对象包含触发此效果所需的所有信息（如攻击者、被击中的目标、伤害量）。
+  * **创建脚本 [`effect_chain_reaction.gd`](extensions/custom_effects/effect_chain_reaction.gd)**，继承自 [`EffectData`](lib/roguekit/entity/effect_data.gd)。实际文件位于 [`extensions/custom_effects/effect_chain_reaction.gd`](extensions/custom_effects/effect_chain_reaction.gd)。
+  * **重写 `execute(context: EffectContext)` 方法**：
+      * [`context`](lib/roguekit/entity/effect_context.gd) 对象包含触发此效果所需的所有信息（如攻击者 `owner`、被击中的目标 `target` 等）。
       * 在 `execute` 方法中，编写逻辑：
         1.  获取被击中目标的位置 `target.global_position`。
         2.  在一定半径内搜索除 `target` 外的其他敌人。
         3.  选取最近的N个敌人（例如2个）。
-        4.  对这N个敌人应用一个新的、伤害略微衰减的 `DamageEffect` 实例。
+        4.  对这N个敌人应用一个新的、伤害略微衰减的 [`DamageEffect`](lib/roguekit/entity/effects/damage_effect.gd) 实例。
 
 #### 步骤 3：运行时组装
 
@@ -113,24 +108,22 @@
 
 #### 步骤 1：配置升级项的数据
 
-  * **升级A (`upgrade_multishot.tres`)**:
+  * **升级A ([`content/upgrades/upgrade_multishot.tres`](content/upgrades/upgrade_multishot.tres))**:
+      * 效果：包含一个 [`StatModifier`](lib/roguekit/entity/stat_modifier.gd) 资源，其逻辑为 `ADDITIVE`（加法），目标属性 `projectile_count`，值 `+2`。
 
-      * 效果：包含一个 `StatModifier` 资源，其逻辑为 `ADDITIVE`（加法），目标属性 `projectile_count`，值 `+2`。
-
-  * **升级B (`upgrade_focus.tres`)**:
-
-      * 效果1：包含一个 `StatModifier` 资源，其逻辑为 `MULTIPLICATIVE`（乘法），目标属性 `damage_multiplier`，值 `+0.2` (即+20%)。
-      * 效果2：包含一个 `StatModifier` 资源，其逻辑为 `MULTIPLICATIVE`（乘法），目标属性 `area_size_multiplier`，值 `+0.2` (即+20%)。
+  * **升级B ([`content/upgrades/upgrade_focus.tres`](content/upgrades/upgrade_focus.tres))**:
+      * 效果1：包含一个 [`StatModifier`](lib/roguekit/entity/stat_modifier.gd) 资源，其逻辑为 `MULTIPLICATIVE`（乘法），目标属性 `damage_multiplier`，值 `+0.2` (即+20%)。
+      * 效果2：包含一个 [`StatModifier`](lib/roguekit/entity/stat_modifier.gd) 资源，其逻辑为 `MULTIPLICATIVE`（乘法），目标属性 `area_size_multiplier`，值 `+0.2` (即+20%)。
 
 #### 步骤 2：能力脚本读取属性
 
-能力的核心脚本（例如 `core_fireball.gd` 的执行逻辑）在触发时不使用固定数值，而是向 `StatsComponent` 请求计算后的属性值：
+能力的核心脚本（例如 `core_fireball.gd` 的执行逻辑）在触发时不使用固定数值，而是向 [`StatsComponent`](lib/roguekit/entity/components/stats_component.gd) 请求计算后的属性值：
 
 ```gdscript
 # 伪代码：在法术执行时
-var projectile_count = stats_component.get_stat_value("projectile_count")
-var damage_amount = base_damage * stats_component.get_stat_value("damage_multiplier")
-var area_size = base_area_size * stats_component.get_stat_value("area_size_multiplier")
+var projectile_count: int = stats_component.get_stat_value("projectile_count")
+var damage_amount: float = base_damage * stats_component.get_stat_value("damage_multiplier")
+var area_size: float = base_area_size * stats_component.get_stat_value("area_size_multiplier")
 
 for i in range(projectile_count):
     # ... 发射投射物，并赋予其计算后的伤害和范围 ...
@@ -151,25 +144,33 @@ for i in range(projectile_count):
 
 #### 步骤 1：设计波次配置文件 (`WaveProfileData`)
 
-创建一个继承自 `Resource` 的新数据类型 `WaveProfileData.tres`，用于存储关卡的时间线。
+创建一个 [`WaveProfile`](lib/roguekit/game_flow/wave_profile.gd) 资源来存储关卡的时间线。
 
 ```gdscript
-# WaveProfileData.tres 内部数据结构示例
-var timeline_events = [
-    { "timestamp": 0, "action": "start_spawning", "enemy_type": "grunt", "spawn_rate": 2.0, "max_alive": 20 },
-    { "timestamp": 30, "action": "start_spawning", "enemy_type": "ranger", "spawn_rate": 0.5, "max_alive": 5 },
-    { "timestamp": 60, "action": "modify_spawn_rate", "enemy_type": "grunt", "new_rate": 3.0 },
-    { "timestamp": 120, "action": "spawn_elite_wave", "elite_group_id": "group_a", "count": 3 },
-    { "timestamp": 180, "action": "set_boss_flag" }
-]
+# [`content/levels/wave_profiles/wave_profile_data.tres`](content/levels/wave_profiles/wave_profile_data.tres) 示例
+# 该资源持有一个 [`WaveEvent`](lib/roguekit/game_flow/wave_event.gd) 资源数组
+# (查看 `content/levels/wave_profiles/events/` 目录下的具体事件)
+
+# [`event_start_grunt_spawn.tres`](content/levels/wave_profiles/events/event_start_grunt_spawn.tres) ([`WaveEvent`](lib/roguekit/game_flow/wave_event.gd))
+@export var timestamp: float = 0.0
+@export var action: WaveAction = WaveAction.START_SPAWNING
+@export var enemy_data: EntityData
+@export var spawn_rate: float = 2.0
+@export var max_alive: int = 20
+
+# [`event_modify_grunt_spawn.tres`](content/levels/wave_profiles/events/event_modify_grunt_spawn.tres) ([`WaveEvent`](lib/roguekit/game_flow/wave_event.gd))
+@export var timestamp: float = 60.0
+@export var action: WaveAction = WaveAction.MODIFY_SPAWN_RATE
+@export var enemy_data: EntityData # 用于定位要修改的生成器
+@export var new_spawn_rate: float = 3.0
 ```
 
 #### 步骤 2：实现波次管理器 (`WaveManager`)
 
-  * 创建一个 `WaveManager` 节点。
-  * 在游戏开始时加载对应的 `WaveProfileData.tres`。
+  * 创建一个 [`WaveManager`](lib/roguekit/game_flow/wave_manager.gd) 节点。
+  * 在游戏开始时加载对应的 [`WaveProfileData.tres`](content/levels/wave_profiles/wave_profile_data.tres)。
   * 在 `_process` 函数中，根据游戏内的计时器 `game_time` 遍历 `timeline_events` 数组。
-  * 当 `game_time` 达到事件的 `timestamp` 时，执行相应的 `action`，调用 `Spawner` 节点来生成敌人或调整生成参数。
+  * 当 `game_time` 达到事件的 `timestamp` 时，执行相应的 `action`，调用 [`Spawner`](lib/roguekit/game_flow/spawner.gd) 节点来生成敌人或调整生成参数。
 
 ## 5. 高级扩展模式：超越基础配置
 
@@ -181,10 +182,10 @@ var timeline_events = [
 
 **工作流**：
 
-1.  **创建新脚本**：创建一个新脚本文件（例如 `effect_lifesteal.gd`），使其继承自 `RogueKit` 的 `EffectData` 基类。
+1.  **创建新脚本**：创建一个新脚本文件（例如 `effect_lifesteal.gd`），使其继承自 `RogueKit` 的 [`EffectData`](lib/roguekit/entity/effect_data.gd) 基类。
 2.  **实现逻辑**：重写 `execute(context)` 方法。在此方法中，编写逻辑：
-      * 从 `context` 中获取造成伤害的数值 `damage_dealt`。
-      * 从 `context.attacker` 的 `StatsComponent` 中获取吸血率 `lifesteal_ratio`。
+      * 从 [`context`](lib/roguekit/entity/effect_context.gd) 中获取造成伤害的数值 `damage_dealt`。
+      * 从 `context.attacker` 的 [`StatsComponent`](lib/roguekit/entity/components/stats_component.gd) 中获取吸血率 `lifesteal_ratio`。
       * 计算回复量 `heal_amount = damage_dealt * lifesteal_ratio`。
       * 调用 `context.attacker.health_component.heal(heal_amount)`。
 3.  **配置使用**：在 Godot 编辑器中创建该新脚本的资源实例（`.tres` 文件）。现在，您可以将这个“吸血效果”资源添加到物品或升级选项的 `effects` 数组中。
@@ -195,9 +196,9 @@ var timeline_events = [
 
 **工作流**：
 
-1.  **创建新脚本**：创建一个新脚本文件（例如 `river_generation_pass.gd`），使其继承自 `GenerationPass` 基类。
-2.  **实现逻辑**：重写 `generate(map_data)` 方法。在此方法中，实现您的河流生成算法（例如使用随机游走算法），修改传入的 `MapData` 对象，将对应坐标的瓦片类型设置为 `FLOOR`。
-3.  **配置使用**：创建该脚本的资源实例后，将其拖拽到 `MapGenerationProfile` 的通道数组中，与其他生成通道（如 `BSPTreePass`）组合使用。
+1.  **创建新脚本**：创建一个新脚本文件（例如 `river_generation_pass.gd`），使其继承自 [`GenerationPass`](lib/roguekit/world_gen/generation_pass.gd) 基类。
+2.  **实现逻辑**：重写 `generate(map_data)` 方法。在此方法中，实现您的河流生成算法（例如使用随机游走算法），修改传入的 [`MapData`](lib/roguekit/world_gen/map_data.gd) 对象，将对应坐标的瓦片类型设置为 `FLOOR`。
+3.  **配置使用**：创建该脚本的资源实例后，将其拖拽到 [`MapGenerationProfile`](lib/roguekit/world_gen/map_generation_profile.gd) 的通道数组中，与其他生成通道（如 [`BSPTreePass`](lib/roguekit/world_gen/bsp_tree_pass.gd)）组合使用。
 
 ### 5.3. 模式三：扩展 AI 行为树节点
 
@@ -205,9 +206,9 @@ var timeline_events = [
 
 **工作流**：
 
-1.  **创建新脚本**：创建一个新脚本文件（例如 `condition_check_nearby_allies.gd`），使其继承自 `BehaviorNode` 基类。
+1.  **创建新脚本**：创建一个新脚本文件（例如 `condition_check_nearby_allies.gd`），使其继承自 [`BehaviorNode`](lib/roguekit/ai/behavior_node.gd) 基类。
 2.  **实现逻辑**：重写 `tick()` 方法。编写逻辑来扫描周围区域，检查是否存在其他“盟友”标签的实体。根据检查结果返回 `Status.SUCCESS` 或 `Status.FAILURE`。
-3.  **配置使用**：在 Godot 编辑器中，这个新创建的条件节点现在可以作为构建块，在 `AIBehaviorProfile` 中与其他节点一起组装，以创建更复杂的 AI 逻辑。
+3.  **配置使用**：在 Godot 编辑器中，这个新创建的条件节点现在可以作为构建块，在 [`AIBehaviorProfile`](lib/roguekit/ai/ai_behavior_profile.gd) 中与其他节点一起组装，以创建更复杂的 AI 逻辑。
 
 ## 6. 推荐的项目结构
 
